@@ -216,7 +216,7 @@ export default function HomePage() {
 
 
   return (
-    <div className="min-h-screen p-6 mystical-gradient traditional-pattern">
+    <div className="min-h-screen p-6 traditional-pattern">
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
