@@ -3,8 +3,9 @@ import { ApiResponse } from '@/lib/utils';
 
 // OpenAI API 설정
 const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
-const MAX_TOKENS = 4000; // 더 자세한 분석을 위해 토큰 수 증가
-const TIMEOUT_MS = 30000; // 30초 타임아웃
+const MAX_TOKENS = 1000; // Vercel 서버리스 타임아웃 방지 위해 토큰 수를 더 줄임
+const TIMEOUT_MS = 25000; // 25초로 제한 (Vercel 30초 제한보다 짧게)
+// 프롬프트가 너무 길면 응답이 늦어질 수 있으니, 프론트엔드에서도 꼭 필요한 내용만 요청하도록 유지하세요.
 
 // 요청 제한 설정
 const RATE_LIMIT = {
@@ -42,17 +43,24 @@ function checkRateLimit(ip: string): boolean {
 }
 
 // OpenAI API 호출 함수
-async function callOpenAI(messages: any[]): Promise<any> {
+async function callOpenAI(messages: any[], retryCount = 0): Promise<any> {
   const apiKey = process.env.OPENAI_API_KEY;
   
   if (!apiKey) {
     throw new Error('OpenAI API 키가 설정되지 않았습니다.');
   }
 
+  // API 키 형식 검증
+  if (!apiKey.startsWith('sk-')) {
+    throw new Error('OpenAI API 키 형식이 올바르지 않습니다.');
+  }
+
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), TIMEOUT_MS);
 
   try {
+    console.log(`OpenAI API 호출 시작... (시도 ${retryCount + 1}/3)`);
+    
     const response = await fetch(OPENAI_API_URL, {
       method: 'POST',
       headers: {
@@ -60,7 +68,7 @@ async function callOpenAI(messages: any[]): Promise<any> {
         'Authorization': `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: 'gpt-4o', // 모델명을 gpt-4o로 변경
+        model: 'gpt-4o-mini', // gpt-4o-mini로 변경 (더 안정적)
         messages,
         max_tokens: MAX_TOKENS,
         temperature: 0.7,
@@ -73,19 +81,54 @@ async function callOpenAI(messages: any[]): Promise<any> {
 
     clearTimeout(timeoutId);
 
+    console.log('OpenAI API 응답 상태:', response.status, response.statusText);
+
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
+      // 응답 텍스트를 먼저 가져와서 로깅
+      const responseText = await response.text();
+      console.error('OpenAI API 오류 응답 텍스트:', responseText);
+      
+      let errorData: any = {};
+      try {
+        errorData = JSON.parse(responseText);
+      } catch (parseError) {
+        console.error('JSON 파싱 오류:', parseError);
+        throw new Error(`OpenAI API 오류: ${response.status} - ${response.statusText} (응답: ${responseText.substring(0, 100)}...)`);
+      }
+      
       console.error('OpenAI API 오류 상세:', {
         status: response.status,
         statusText: response.statusText,
         errorData: errorData
       });
+      
+      // 재시도 가능한 오류인지 확인
+      const isRetryableError = response.status >= 500 || response.status === 429;
+      if (isRetryableError && retryCount < 2) {
+        console.log(`재시도 가능한 오류 감지. ${retryCount + 1}초 후 재시도...`);
+        await new Promise(resolve => setTimeout(resolve, (retryCount + 1) * 1000));
+        return callOpenAI(messages, retryCount + 1);
+      }
+      
       throw new Error(
         `OpenAI API 오류: ${response.status} - ${errorData.error?.message || response.statusText}`
       );
     }
 
-    return await response.json();
+    // 성공 응답 처리
+    const responseText = await response.text();
+    console.log('OpenAI API 성공 응답 길이:', responseText.length);
+    
+    let result;
+    try {
+      result = JSON.parse(responseText);
+    } catch (parseError) {
+      console.error('성공 응답 JSON 파싱 오류:', parseError);
+      console.error('응답 텍스트:', responseText.substring(0, 200));
+      throw new Error('OpenAI API 응답 형식이 올바르지 않습니다.');
+    }
+
+    return result;
   } catch (error) {
     clearTimeout(timeoutId);
     
@@ -145,10 +188,13 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
     }
 
     // OpenAI API 호출
+    console.log('API 호출 시작...');
     const result = await callOpenAI(messages);
+    console.log('API 호출 완료');
 
     // 응답 검증
     if (!result.choices || !result.choices[0]?.message?.content) {
+      console.error('API 응답 검증 실패:', result);
       throw new Error('OpenAI API에서 올바른 응답을 받지 못했습니다.');
     }
 

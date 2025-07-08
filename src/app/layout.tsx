@@ -103,14 +103,28 @@ export default function RootLayout({
           backgroundImage: "url('/saju-bg.jpg')",
           backgroundSize: 'cover',
           backgroundPosition: 'center',
-          minHeight: '100vh'
+          minHeight: '100vh',
+          position: 'relative',
         }}
       >
+        {/* 어두운 몽환적 오버레이 */}
+        <div
+          style={{
+            position: 'absolute',
+            zIndex: 0,
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            pointerEvents: 'none',
+            background: 'linear-gradient(135deg, rgba(10,0,20,0.92) 0%, rgba(0,0,0,0.92) 70%, rgba(40,0,60,0.85) 100%)',
+            opacity: 0.92,
+          }}
+        />
         {/* 메인 컨텐츠 */}
-        <main className="min-h-screen">
+        <main className="min-h-screen" style={{ position: 'relative', zIndex: 10 }}>
           {children}
         </main>
-        
         {/* Google Analytics (선택사항) */}
         {process.env.NODE_ENV === 'production' && (
           <>

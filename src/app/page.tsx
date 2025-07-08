@@ -88,6 +88,61 @@ export default function HomePage() {
     return Object.keys(newErrors).length === 0;
   };
 
+  // 간단한 테스트 함수
+  const handleTest = async () => {
+    setLoading(true);
+    setResult('');
+
+    try {
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: [
+            {
+              role: 'user',
+              content: '안녕하세요. 간단한 테스트입니다.'
+            }
+          ]
+        })
+      });
+
+      const responseText = await response.text();
+      console.log('테스트 응답:', responseText);
+      
+      let data;
+      try {
+        data = JSON.parse(responseText);
+      } catch (parseError) {
+        throw new Error(`테스트 응답 파싱 오류: ${responseText.substring(0, 100)}`);
+      }
+
+      if (data.success && data.data?.content) {
+        setResult(`✅ 테스트 성공!\n\n${data.data.content}`);
+      } else {
+        throw new Error(data.error || '테스트 실패');
+      }
+    } catch (error) {
+      console.error('테스트 오류:', error);
+      setResult(`❌ 테스트 실패: ${error instanceof Error ? error.message : '알 수 없는 오류'}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 폼 상태 초기화 함수
+  const handleReset = () => {
+    setForm({
+      fullName: '',
+      hanja: '',
+      birthDate: '',
+      birthTime: '',
+      birthPlace: ''
+    });
+    setErrors({});
+    setResult('');
+  };
+
   // 폼 제출 처리
   const handleSubmit = async () => {
     // 유효성 검사
@@ -108,18 +163,8 @@ export default function HomePage() {
             {
               role: 'system',
               content: `당신은 정통 명리학과 성명학 전문가입니다. 
-              다음 지침을 따라 사주풀이와 이름 분석을 해주세요:
-              
-              1. 정통 명리학 이론을 바탕으로 분석
-              2. 현실적이고 신뢰감 있는 말투 사용
-              3. 긍정적이면서도 객관적인 조언 제공
-              4. 구체적이고 실용적인 해석
-              5. 한글로 명확하게 설명
-              6. 과도한 미신적 요소는 배제
-              7. 전문적이면서도 이해하기 쉽게 설명
-              8. 각 항목별로 자세하고 상세한 분석 제공
-              9. 실제 사례와 예시를 포함한 설명
-              10. 최소 1000자 이상의 상세한 분석 제공`
+              간단하고 명확하게 사주풀이와 이름 분석을 해주세요.
+              한글로 설명하고, 실용적인 조언을 제공해주세요.`
             },
             {
               role: 'user',
@@ -130,58 +175,32 @@ export default function HomePage() {
               출생시간: ${form.birthTime}
               출생지: ${form.birthPlace}
               
-              위 정보를 바탕으로 다음을 매우 자세하게 분석해주세요:
+              위 정보를 바탕으로 간단하게 다음을 분석해주세요:
               
-              【사주팔자 분석】
-              1. 일간(日干) 분석과 오행 균형
-              2. 십이운성과 십이신살 분석
-              3. 천간지지의 조합과 영향
-              4. 월령과 계절의 영향
+              1. 사주팔자 기본 분석
+              2. 성격적 특징
+              3. 적성과 직업 방향
+              4. 건강상 주의사항
+              5. 향후 운세 전망
               
-              【성격적 특징】
-              1. 선천적 성격과 기질
-              2. 강점과 약점 분석
-              3. 대인관계 성향
-              4. 의사결정 스타일
-              
-              【적성과 직업 방향】
-              1. 적합한 직업 분야
-              2. 창업이나 사업 적성
-              3. 학문적 소질
-              4. 재능 개발 방향
-              
-              【건강상 주의사항】
-              1. 취약한 신체 부위
-              2. 주의해야 할 질병
-              3. 건강 관리 방법
-              4. 생활 습관 개선점
-              
-              【이름의 의미와 영향】
-              1. 한자 의미 분석
-              2. 오행과의 조화
-              3. 사주와의 연관성
-              4. 이름이 미치는 영향
-              
-              【향후 운세 전망】
-              1. 10년 대운 분석
-              2. 연운과 월운 전망
-              3. 주요 변화 시기
-              4. 행운과 기회의 시기
-              
-              【개선 방안과 조언】
-              1. 운세 개선 방법
-              2. 행운을 부르는 행동
-              3. 주의해야 할 시기
-              4. 평생 행복을 위한 조언
-              
-              각 항목별로 구체적이고 실용적인 조언을 제공해주시고, 
-              전문적이면서도 이해하기 쉽게 설명해주세요.`
+              간단하고 실용적인 조언을 제공해주세요.`
             }
           ]
         })
       });
 
-      const data = await response.json();
+      // 응답 텍스트를 먼저 가져와서 로깅
+      const responseText = await response.text();
+      console.log('API 응답 상태:', response.status, response.statusText);
+      console.log('API 응답 텍스트:', responseText.substring(0, 200));
+      
+      let data;
+      try {
+        data = JSON.parse(responseText);
+      } catch (parseError) {
+        console.error('JSON 파싱 오류:', parseError);
+        throw new Error(`서버 응답 형식 오류: ${responseText.substring(0, 100)}...`);
+      }
 
       if (!response.ok) {
         throw new Error(data.error || '분석 중 오류가 발생했습니다.');
@@ -207,7 +226,24 @@ export default function HomePage() {
 
     } catch (error) {
       console.error('분석 오류:', error);
-      setResult(error instanceof Error ? error.message : '분석 중 오류가 발생했습니다. 다시 시도해주세요.');
+      
+      let errorMessage = '분석 중 오류가 발생했습니다. 다시 시도해주세요.';
+      
+      if (error instanceof Error) {
+        if (error.message.includes('API 키')) {
+          errorMessage = '서버 설정에 문제가 있습니다. 관리자에게 문의해주세요.';
+        } else if (error.message.includes('시간이 초과')) {
+          errorMessage = '요청 시간이 초과되었습니다. 잠시 후 다시 시도해주세요.';
+        } else if (error.message.includes('서버 응답 형식 오류')) {
+          errorMessage = '서버에서 예상치 못한 응답을 받았습니다. 잠시 후 다시 시도해주세요.';
+        } else if (error.message.includes('OpenAI API 오류')) {
+          errorMessage = 'AI 분석 서비스에 일시적인 문제가 있습니다. 잠시 후 다시 시도해주세요.';
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
+      setResult(`❌ 오류: ${errorMessage}`);
     } finally {
       setLoading(false);
     }
@@ -351,11 +387,27 @@ export default function HomePage() {
               )}
             </div>
 
+            {/* 테스트 버튼 */}
+            <Button 
+              onClick={handleTest} 
+              disabled={loading} 
+              className="traditional-button w-full mt-4 py-3 text-md font-bold bg-blue-600 hover:bg-blue-700"
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                  테스트 중...
+                </>
+              ) : (
+                '🧪 API 연결 테스트'
+              )}
+            </Button>
+
             {/* 제출 버튼 */}
             <Button 
               onClick={handleSubmit} 
               disabled={loading} 
-              className="traditional-button w-full mt-8 py-4 text-lg font-bold"
+              className="traditional-button w-full mt-4 py-4 text-lg font-bold"
             >
               {loading ? (
                 <>
@@ -384,6 +436,14 @@ export default function HomePage() {
             <div className="text-white/90 leading-relaxed whitespace-pre-wrap text-lg">
               {result}
             </div>
+            {/* 다시 하기 버튼 */}
+            <button
+              type="button"
+              onClick={handleReset}
+              className="mt-8 w-full py-3 rounded-xl font-bold text-lg bg-gradient-to-r from-gray-700/80 to-black/70 text-white hover:opacity-90 transition"
+            >
+              🔄 다시 하기
+            </button>
           </motion.div>
         )}
       </motion.div>
