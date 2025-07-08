@@ -132,6 +132,9 @@ secrets.json
 *.key
 *.pem
 
+# Test files and development artifacts (moved to naver api folder)
+naver api/
+
 # Database
 *.db
 *.sqlite

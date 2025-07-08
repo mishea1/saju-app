@@ -1,3 +1,5 @@
+// 테스트용 API - 배포 시 주석처리
+/*
 import { NextResponse } from 'next/server';
 
 export async function GET() {
@@ -56,4 +58,5 @@ export async function GET() {
       error: error instanceof Error ? error.message : '알 수 없는 오류'
     });
   }
-} 
+}
+*/ 
