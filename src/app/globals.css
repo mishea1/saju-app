@@ -1,0 +1,238 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* CSS 변수 정의 */
+:root {
+  --background: 0 0% 100%;
+  --foreground: 222.2 84% 4.9%;
+  --card: 0 0% 100%;
+  --card-foreground: 222.2 84% 4.9%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 222.2 84% 4.9%;
+  --primary: 221.2 83.2% 53.3%;
+  --primary-foreground: 210 40% 98%;
+  --secondary: 210 40% 96%;
+  --secondary-foreground: 222.2 84% 4.9%;
+  --muted: 210 40% 96%;
+  --muted-foreground: 215.4 16.3% 46.9%;
+  --accent: 210 40% 96%;
+  --accent-foreground: 222.2 84% 4.9%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 210 40% 98%;
+  --border: 214.3 31.8% 91.4%;
+  --input: 214.3 31.8% 91.4%;
+  --ring: 221.2 83.2% 53.3%;
+  --radius: 0.5rem;
+}
+
+/* 다크모드 설정 */
+.dark {
+  --background: 222.2 84% 4.9%;
+  --foreground: 210 40% 98%;
+  --card: 222.2 84% 4.9%;
+  --card-foreground: 210 40% 98%;
+  --popover: 222.2 84% 4.9%;
+  --popover-foreground: 210 40% 98%;
+  --primary: 217.2 91.2% 59.8%;
+  --primary-foreground: 222.2 84% 4.9%;
+  --secondary: 217.2 32.6% 17.5%;
+  --secondary-foreground: 210 40% 98%;
+  --muted: 217.2 32.6% 17.5%;
+  --muted-foreground: 215 20.2% 65.1%;
+  --accent: 217.2 32.6% 17.5%;
+  --accent-foreground: 210 40% 98%;
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 210 40% 98%;
+  --border: 217.2 32.6% 17.5%;
+  --input: 217.2 32.6% 17.5%;
+  --ring: 224.3 76.3% 94.1%;
+}
+
+/* 기본 스타일 */
+* {
+  border-color: hsl(var(--border));
+}
+
+body {
+  color: hsl(var(--foreground));
+  background: hsl(var(--background));
+}
+
+/* 스크롤바 스타일링 */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: hsl(var(--muted));
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground));
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--foreground));
+}
+
+/* 포커스 스타일 */
+.focus-visible {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 2px;
+}
+
+/* 애니메이션 클래스 */
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+.animate-slide-up {
+  animation: slideUp 0.3s ease-out;
+}
+
+/* 반응형 유틸리티 */
+@media (max-width: 640px) {
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+/* 접근성 개선 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+} 
+
+/* 한국 전통 무속신앙 테마 CSS */
+:root {
+  --traditional-red: #8B0000;
+  --traditional-gold: #DAA520;
+  --traditional-navy: #000080;
+  --traditional-bronze: #CD7F32;
+  --traditional-jade: #4A7C59;
+  --traditional-ink: #1C1C1C;
+}
+
+/* 전통 문양 배경 패턴 */
+.traditional-pattern {
+  background-image: 
+    radial-gradient(circle at 25% 25%, rgba(218, 165, 32, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 75% 75%, rgba(139, 0, 0, 0.1) 0%, transparent 50%),
+    linear-gradient(45deg, rgba(74, 124, 89, 0.05) 25%, transparent 25%),
+    linear-gradient(-45deg, rgba(205, 127, 50, 0.05) 25%, transparent 25%);
+  background-size: 100px 100px, 150px 150px, 50px 50px, 50px 50px;
+}
+
+/* 신비로운 그라데이션 배경 */
+.mystical-gradient {
+  background: linear-gradient(135deg, 
+    rgba(139, 0, 0, 0.8) 0%, 
+    rgba(0, 0, 128, 0.9) 25%, 
+    rgba(28, 28, 28, 0.95) 50%, 
+    rgba(74, 124, 89, 0.8) 75%, 
+    rgba(205, 127, 50, 0.7) 100%);
+}
+
+/* 전통 카드 스타일 */
+.traditional-card {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 2px solid rgba(218, 165, 32, 0.3);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+/* 전통 버튼 스타일 */
+.traditional-button {
+  background: linear-gradient(135deg, var(--traditional-red), var(--traditional-navy));
+  border: 2px solid var(--traditional-gold);
+  box-shadow: 
+    0 4px 15px rgba(139, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+}
+
+.traditional-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 6px 20px rgba(139, 0, 0, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+/* 전통 입력창 스타일 */
+.traditional-input {
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(218, 165, 32, 0.3);
+  backdrop-filter: blur(5px);
+  transition: all 0.3s ease;
+}
+
+.traditional-input:focus {
+  border-color: var(--traditional-gold);
+  box-shadow: 0 0 15px rgba(218, 165, 32, 0.5);
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* 전통 제목 스타일 */
+.traditional-title {
+  background: linear-gradient(135deg, var(--traditional-gold), var(--traditional-bronze));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* 신비로운 애니메이션 */
+@keyframes mystical-glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(218, 165, 32, 0.3); }
+  50% { box-shadow: 0 0 30px rgba(218, 165, 32, 0.6); }
+}
+
+.mystical-glow {
+  animation: mystical-glow 3s ease-in-out infinite;
+}
+
+/* 전통 문양 장식 */
+.traditional-ornament {
+  position: relative;
+}
+
+.traditional-ornament::before,
+.traditional-ornament::after {
+  content: '☯';
+  position: absolute;
+  top: -10px;
+  font-size: 24px;
+  color: var(--traditional-gold);
+  opacity: 0.7;
+}
+
+.traditional-ornament::before {
+  left: -30px;
+}
+
+.traditional-ornament::after {
+  right: -30px;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  .traditional-card {
+    margin: 10px;
+    padding: 20px;
+  }
+  
+  .traditional-ornament::before,
+  .traditional-ornament::after {
+    display: none;
+  }
+} 
